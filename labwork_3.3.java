@@ -26,6 +26,7 @@ public class Main extends AppCompatActivity {
         final EditText cEditText = (EditText) findViewById(R.id.cEditText);
         final EditText dEditText = (EditText) findViewById(R.id.dEditText);
         final EditText yEditText = (EditText) findViewById(R.id.yEditText);
+        final EditText mutationMultiplierEditText = (EditText) findViewById(R.id.mEditText);
 
         final TextView resTextView = (TextView) findViewById(R.id.resTextViewl3);
         Button calcButton = (Button) findViewById(R.id.calcButtonl3);
@@ -40,8 +41,9 @@ public class Main extends AppCompatActivity {
                     int c = Integer.parseInt(cEditText.getText().toString());
                     int d = Integer.parseInt(dEditText.getText().toString());
                     int y = Integer.parseInt(yEditText.getText().toString());
+                    double mutationMultiplier = Double.parseDouble(mutationMultiplierEditText.getText().toString())
                     long start = System.nanoTime();
-                    int[] x1234 = solve(a, b, c, d, y);
+                    int[] x1234 = solve(a, b, c, d, y, mutationMultiplier);
                     long execTimeMls = (System.nanoTime() - start) / 1_000_000;
                     resTextView.setText(
                             String.format("x1 = %d\nx2 = %d\nx3 = %d\nx4 = %d\nExecution time: %d ms",
@@ -166,17 +168,16 @@ public class Main extends AppCompatActivity {
         return mean;
     }
 
-    private void change(int[][] population, int y) {
-        double prob = 0.5;
+    private void mutate(int[][] population, int y, double mutationMult) {
         for (int i = 0; i < population.length; i++) {
             for (int j = 0; j < population[0].length; j++) {
                 double coin = random.nextDouble();
-                if (coin <= prob) population[i][j] = random.nextInt(y + 1);
+                if (coin <= mutationMult) population[i][j] = random.nextInt(y + 1);
             }
         }
     }
 
-    private int[] solve(int a, int b, int c, int d, int y) {
+    private int[] solve(int a, int b, int c, int d, int y, double mutationMult) {
         int[][] population = firstPopulation(y);
         int[] array = {a, b, c, d};
         int index;
@@ -192,7 +193,7 @@ public class Main extends AppCompatActivity {
                 if (avgSurvivalOld < avgSurvivalNew) {
                     population = newPopulation;
                 } else {
-                    change(population, y);
+                    mutate(population, y, mutationMult);
                 }
             }
         }
